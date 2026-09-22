@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devine le joueur — Dossier StarCraft II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f14;
+    --bg-grid: #0e131a;
+    --panel: #121820;
+    --panel-alt: #182029;
+    --line: #263140;
+    --line-soft: #1c2530;
+    --amber: #f2a93b;
+    --amber-dim: #7a5b22;
+    --cyan: #52d1c0;
+    --text: #dfe6ee;
+    --muted: #7c8896;
+    --danger: #e2574c;
+    --success: #4cc38a;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    min-height:100%;
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/28px 100%,
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:640px;
+  }
+
+  /* ---------- Mode tabs ---------- */
+  .mode-tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .tab-btn{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:10px 14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.3px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .tab-btn:hover{ color:var(--text); }
+  .tab-btn.active{
+    color:var(--amber);
+    border-color:var(--amber);
+    background:var(--panel-alt);
+  }
+
+  .top-bar{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .lang-switch{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .lang-btn{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:6px 10px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .lang-btn:hover{ color:var(--text); }
+  .lang-btn.active{
+    color:var(--amber);
+    border-color:var(--amber);
+    background:var(--panel-alt);
+  }
+  .btn--new{
+    border-color:var(--cyan);
+    color:var(--cyan);
+  }
+  .btn--new:hover:not(:disabled){
+    background:var(--cyan);
+    color:#062420;
+    border-color:var(--cyan);
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:16px;
+    margin-bottom:18px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;
+  }
+
+  h1{
+    font-family:'Teko', sans-serif;
+    font-weight:600;
+    font-size:44px;
+    line-height:0.9;
+    letter-spacing:0.5px;
+    margin:0;
+    color:var(--text);
+  }
+
+  h1 span{ color:var(--amber); }
+
+  .subtitle{
+    margin:4px 0 0;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.5px;
+  }
+
+  .header-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+  }
+
+  .case-meta{
+    text-align:right;
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.7;
+    white-space:nowrap;
+  }
+
+  .case-meta b{ color:var(--cyan); font-weight:500; }
+
+  /* ---------- Dossier card ---------- */
+  .dossier{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    margin-top:26px;
+  }
+
+  .tab{
+    position:absolute;
+    top:-24px;
+    left:20px;
+    background:var(--panel-alt);
+    border:1px solid var(--line);
+    border-bottom:none;
+    padding:5px 14px 8px;
+    font-size:12px;
+    letter-spacing:1.5px;
+    color:var(--amber);
+  }
+
+  .dossier__inner{ padding:28px 24px 22px; }
+
+  .clue-row{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line-soft);
+    align-items:start;
+  }
+  .clue-row:last-child{ border-bottom:none; }
+
+  .clue-index{
+    font-family:'Teko', sans-serif;
+    font-size:26px;
+    color:var(--muted);
+    line-height:1.2;
+  }
+
+  .clue-row.revealed .clue-index{ color:var(--amber); }
+  .clue-row.nationality .clue-index{ color:var(--cyan); }
+
+  .clue-body{ min-width:0; }
+
+  .clue-label{
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+
+  .clue-value{
+    font-size:15px;
+    color:var(--text);
+  }
+
+  .clue-dates{
+    color:var(--cyan);
+    font-size:13px;
+  }
+
+  .clue-team{
+    font-weight:600;
+    margin-left:8px;
+  }
+
+  /* locked / redacted */
+  .redacted{
+    display:inline-block;
+    height:14px;
+    background:repeating-linear-gradient(
+      45deg,
+      #1e2833,
+      #1e2833 4px,
+      #232f3c 4px,
+      #232f3c 8px
+    );
+    border-radius:2px;
+    vertical-align:middle;
+  }
+
+  .clue-row.locked .clue-value{ display:flex; gap:8px; align-items:center; }
+  .lock-icon{ color:var(--muted); font-size:13px; }
+
+  @keyframes revealIn{
+    from{ opacity:0; transform:translateY(-4px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .clue-row.just-revealed .clue-value{ animation:revealIn .35s ease-out; }
+
+  /* ---------- Actions ---------- */
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+
+  button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.3px;
+    cursor:pointer;
+    border-radius:2px;
+  }
+
+  .btn{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:10px 16px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .btn:hover:not(:disabled){ border-color:var(--amber); color:var(--amber); }
+  .btn:disabled{ opacity:0.35; cursor:default; }
+
+  .btn--ghost{
+    border-color:transparent;
+    color:var(--muted);
+  }
+  .btn--ghost:hover:not(:disabled){ color:var(--danger); border-color:var(--danger); }
+
+  /* ---------- Guess form ---------- */
+  .guess-panel{
+    margin-top:22px;
+    border:1px solid var(--line);
+    background:var(--panel-alt);
+    padding:18px 20px;
+  }
+
+  .guess-panel__label{
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+
+  .guess-row{
+    display:flex;
+    gap:10px;
+  }
+
+  input[type="text"]{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    padding:11px 12px;
+    caret-color:var(--amber);
+  }
+  input[type="text"]:focus{
+    outline:none;
+    border-color:var(--amber);
+  }
+  input[type="text"]::placeholder{ color:var(--muted); }
+
+  .btn--submit{
+    background:var(--amber);
+    border:1px solid var(--amber);
+    color:#1a1206;
+    font-weight:600;
+    padding:11px 20px;
+  }
+  .btn--submit:hover:not(:disabled){ background:#ffb955; border-color:#ffb955; color:#1a1206; }
+  .btn--submit:disabled{ opacity:0.35; cursor:default; }
+
+  .feedback{
+    margin-top:12px;
+    font-size:13px;
+    min-height:18px;
+  }
+  .feedback.wrong{ color:var(--danger); }
+  .feedback.right{ color:var(--success); }
+
+  @keyframes shake{
+    10%,90%{ transform:translateX(-2px); }
+    20%,80%{ transform:translateX(3px); }
+    30%,50%,70%{ transform:translateX(-5px); }
+    40%,60%{ transform:translateX(5px); }
+  }
+  .shake{ animation:shake .4s; }
+
+  /* ---------- Win state ---------- */
+  .win-banner{
+    margin-top:22px;
+    border:1px solid var(--success);
+    background:rgba(76,195,138,0.08);
+    padding:20px;
+    display:none;
+    position:relative;
+    overflow:hidden;
+  }
+  .win-banner.show{ display:block; }
+  .win-banner.lose{
+    border-color:var(--danger);
+    background:rgba(226,87,76,0.08);
+  }
+
+  .stamp{
+    display:inline-block;
+    border:3px solid var(--success);
+    color:var(--success);
+    font-family:'Teko', sans-serif;
+    font-size:26px;
+    letter-spacing:3px;
+    padding:2px 14px;
+    transform:rotate(-6deg);
+    margin-bottom:10px;
+  }
+  .win-banner.lose .stamp{
+    border-color:var(--danger);
+    color:var(--danger);
+  }
+
+  .win-detail{ font-size:13px; color:var(--muted); line-height:1.6; }
+  .win-detail b{ color:var(--text); }
+
+  footer{
+    margin-top:22px;
+    text-align:center;
+    font-size:11px;
+    color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>DOSSIER<span>//</span>SC2</h1>
+      <p class="subtitle" id="subtitleEl">Identifiez le joueur à partir de son parcours en équipe</p>
+    </div>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" id="langFrBtn">FR</button>
+        <button class="lang-btn" id="langEnBtn">EN</button>
+      </div>
+      <div class="case-meta">
+        <span id="lblAttempts">TENTATIVES</span> <b id="statAttempts">0</b><br>
+        <span id="lblClues">INDICES UTILISÉS</span> <b id="statClues">1</b>
+      </div>
+    </div>
+  </header>
+
+  <div class="mode-tabs">
+    <button class="tab-btn active" id="tabPlayerBtn">🕵️ Deviner le joueur</button>
+    <button class="tab-btn" id="tabTeamBtn">🏳️ Deviner l'équipe</button>
+  </div>
+
+  <div class="top-bar">
+    <button class="btn btn--new" id="newGameBtnTop">🔄 Nouvelle partie</button>
+  </div>
+
+  <div class="dossier">
+    <div class="tab" id="dossierTabLabel">DOSSIER CONFIDENTIEL</div>
+    <div class="dossier__inner">
+      <div id="clueList"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="revealBtn">Révéler l'indice suivant</button>
+    <button class="btn btn--ghost" id="giveUpBtn">Abandonner</button>
+  </div>
+
+  <div class="guess-panel">
+    <div class="guess-panel__label" id="guessPanelLabel">VOTRE RÉPONSE</div>
+    <div class="guess-row">
+      <input type="text" id="guessInput" placeholder="Nom du joueur…" autocomplete="off">
+      <button class="btn btn--submit" id="submitBtn">Valider</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="win-banner" id="winBanner">
+    <div class="stamp" id="stampText">IDENTIFIÉ</div>
+    <div class="win-detail">
+      <span id="winLead">Le joueur était bien</span> <b id="winName">—</b>.<br>
+      <span id="winFoundWith">Trouvé avec <b id="winClues">—</b> indice(s) et <b id="winAttempts">—</b> tentative(s).</span>
+    </div>
+    <div class="actions" style="margin-top:14px;">
+      <button class="btn" id="newGameBtn">Nouvelle partie</button>
+    </div>
+  </div>
+
+  <footer id="footerText">Deux jeux dans un : devinez un joueur à partir de son parcours en équipe, ou devinez une équipe à partir des joueurs qui l'ont rejointe au fil du temps. Basé sur le top 25 aligulac actuel et des légendes de chaque grande époque.</footer>
+
+</div>
+
+<script>
+/* ==========================================================================
+   BASE DE DONNÉES DES JOUEURS
+   Ajoutez ou modifiez des entrées ici. Chaque équipe a une date de début
+   ("YYYY-MM-DD") et une date de fin ("YYYY-MM-DD" ou "Présent").
+   "aliases" permet d'accepter des variantes orthographiques du pseudo.
+   ========================================================================== */
+const PLAYERS = [
+  {
+    id: "clem",
+    name: "Clem",
+    aliases: ["clem", "clément"],
+    nationality: "France",
+    flag: "🇫🇷",
+    teams: [
+      { start: "2013-10-26", end: "2015-08-08", team: "Punchline ESC" },
+      { start: "2015-08-12", end: "2016-06-19", team: "orKs eSports" },
+      { start: "2016-06-19", end: "2018-01-12", team: "Dead Pixels" },
+      { start: "2018-03-06", end: "2019-02-06", team: "Exeed Esports" },
+      { start: "2019-02-13", end: "2020-01-04", team: "Infinity Gaming" },
+      { start: "2020-02-21", end: "Présent",    team: "Team Liquid" }
+    ]
+  },
+  {
+    id: "serral",
+    name: "Serral",
+    aliases: ["serral"],
+    nationality: "Finlande",
+    flag: "🇫🇮",
+    teams: [
+      { start: "2013-04-23", end: "2014-02-20", team: "ENCE eSports" },
+      { start: "2014-02-24", end: "2016-10-04", team: "mYinsanity" },
+      { start: "2016-10-04", end: "2023-01-27", team: "ENCE" },
+      { start: "2023-01-27", end: "Présent",    team: "BASILISK" }
+    ]
+  },
+  {
+    id: "maru",
+    name: "Maru",
+    aliases: ["maru"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010-10-13", end: "2013-12-13", team: "Prime" },
+      { start: "2013-12-13", end: "2020-11-30", team: "Jin Air Green Wings" },
+      { start: "2020-11-30", end: "2022-03-19", team: "Team NV" },
+      { start: "2022-03-31", end: "2024-02-01", team: "ONSYDE" },
+      { start: "2024-02-01", end: "2026-03-06", team: "Team Vitality" },
+      { start: "2026-03-06", end: "Présent",    team: "ONSYDE" }
+    ]
+  },
+  {
+    id: "solar",
+    name: "Solar",
+    aliases: ["solar"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2012-04-12", end: "2016-10-18", team: "Samsung Galaxy" },
+      { start: "2016-12-01", end: "2018-08-01", team: "Splyce" },
+      { start: "2018-08-31", end: "2018-12-31", team: "Infinity Gaming" },
+      { start: "2019-01-18", end: "2020-06-01", team: "Triumphant Song Gaming" },
+      { start: "2020-06-30", end: "2020-07-31", team: "Kosmos Esports" },
+      { start: "2020-07-31", end: "2022-08-15", team: "KaiZi Gaming" },
+      { start: "2022-08-21", end: "2024-02-01", team: "ONSYDE" },
+      { start: "2024-02-01", end: "2024-10-01", team: "Team Vitality" },
+      { start: "2024-11-03", end: "2026-04-01", team: "Team Falcons" }
+    ]
+  },
+  {
+    id: "hero",
+    name: "herO",
+    aliases: ["hero"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011-11-04", end: "2016-10-18", team: "CJ Entus" },
+      { start: "2017-01-14", end: "2019-01-03", team: "ROOT Gaming" },
+      { start: "2019-01-18", end: "2019-12-10", team: "Triumphant Song Gaming" },
+      { start: "2019-12-10", end: "2021-06-24", team: "Service militaire" },
+      { start: "2021-06-24", end: "2023-03-13", team: "Dragon Phoenix Gaming" },
+      { start: "2023-03-13", end: "2025-02-27", team: "Weibo Gaming" },
+      { start: "2025-04-12", end: "2025-08-26", team: "Twisted Minds" },
+      { start: "2025-09-25", end: "Présent",    team: "T1" }
+    ]
+  },
+  {
+    id: "maxpax",
+    name: "MaxPax",
+    aliases: ["maxpax"],
+    nationality: "Danemark",
+    flag: "🇩🇰",
+    teams: [
+      { start: "2019-07-16", end: "2020-02-22", team: "Mkers" },
+      { start: "2020-05-18", end: "2021-05-26", team: "Team eXoN" },
+      { start: "2021-05-26", end: "Présent",    team: "PSISTORM Gaming" }
+    ]
+  },
+  {
+    id: "reynor",
+    name: "Reynor",
+    aliases: ["reynor"],
+    nationality: "Italie",
+    flag: "🇮🇹",
+    teams: [
+      { start: "2013-11-12", end: "2016-01-10", team: "mYinsanity" },
+      { start: "2016-01-13", end: "2017-06-12", team: "True eSport" },
+      { start: "2017-06-12", end: "2017-09-04", team: "Next Gaming" },
+      { start: "2017-09-04", end: "2018-01-19", team: "Prophecy E-sports" },
+      { start: "2018-01-19", end: "2018-11-12", team: "Exeed Esports" },
+      { start: "2019-01-12", end: "2020-01-05", team: "GamersOrigin" },
+      { start: "2020-02-15", end: "2022-03-21", team: "Team QLASH" },
+      { start: "2022-03-21", end: "2023-02-20", team: "KaiZi Gaming" },
+      { start: "2023-02-24", end: "Présent",    team: "BASILISK" }
+    ]
+  },
+  {
+    id: "shin",
+    name: "SHIN",
+    aliases: ["shin", "ragnarok"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011-07-01", end: "2013-01-03", team: "Team SCV Life" },
+      { start: "2013-01-25", end: "2013-10-01", team: "Incredible Miracle" },
+      { start: "2013-10-01", end: "2014-02-02", team: "AZUBU" },
+      { start: "2015-01-22", end: "2016-10-18", team: "CJ Entus" },
+      { start: "2018-01-05", end: "2018-04-01", team: "TitanEX1" },
+      { start: "2018-04-03", end: "2019-06-14", team: "PSISTORM Gaming" },
+      { start: "2019-07-02", end: "2020-04-07", team: "Chivo SC" },
+      { start: "2020-06-24", end: "2020-06-29", team: "Black Night" },
+      { start: "2020-06-30", end: "2023-05-13", team: "Alpha X" },
+      { start: "2023-05-13", end: "2024-02-13", team: "Mystery Gaming" },
+      { start: "2024-02-29", end: "2025-04-06", team: "Gaimin Gladiators" },
+      { start: "2025-04-15", end: "2026-01-12", team: "Weibo Gaming" },
+      { start: "2026-06-25", end: "Présent",    team: "ONSYDE" }
+    ]
+  },
+  {
+    id: "byun",
+    name: "ByuN",
+    aliases: ["byun"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010-10-18", end: "2011-10-08", team: "ZeNEX" },
+      { start: "2011-10-08", end: "2015-10-18", team: "Prime" },
+      { start: "2015-10-18", end: "2016-05-25", team: "X-Team" },
+      { start: "2016-10-02", end: "2017-12-01", team: "Team expert" },
+      { start: "2019-01-29", end: "2020-06-01", team: "Service militaire" },
+      { start: "2021-02-19", end: "Présent",    team: "Shopify Rebellion" }
+    ]
+  },
+  {
+    id: "cure",
+    name: "Cure",
+    aliases: ["cure"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2013-07-10", end: "2019-12-02", team: "Jin Air Green Wings" },
+      { start: "2019-12-02", end: "2023-02-23", team: "Dragon Phoenix Gaming" },
+      { start: "2023-03-02", end: "2023-10-21", team: "Club NV" },
+      { start: "2023-10-21", end: "Présent",    team: "Team Liquid" }
+    ]
+  },
+  {
+    id: "rogue",
+    name: "Rogue",
+    aliases: ["rogue"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011-11-04", end: "2013-07-10", team: "8th Team" },
+      { start: "2013-07-10", end: "2020-11-30", team: "Jin Air Green Wings" },
+      { start: "2020-11-30", end: "2022-10-05", team: "Dragon Phoenix Gaming" },
+      { start: "2022-10-05", end: "2024-03-25", team: "Service militaire" },
+      { start: "2024-05-30", end: "Présent",    team: "Team Falcons" }
+    ]
+  },
+  {
+    id: "percival",
+    name: "Percival",
+    aliases: ["percival"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2019-10-07", end: "2020-01-24", team: "Black Night" },
+      { start: "2020-02-01", end: "2020-03-01", team: "Kosmos Esports" },
+      { start: "2020-04-24", end: "2020-05-24", team: "KAP" },
+      { start: "2020-06-05", end: "2021-09-08", team: "Team NV" },
+      { start: "2021-09-08", end: "2022-02-05", team: "Team GP" },
+      { start: "2022-09-06", end: "2022-09-14", team: "License to Kill" },
+      { start: "2025-04-18", end: "2025-07-20", team: "LittleFairy" }
+    ]
+  },
+  {
+    id: "spirit",
+    name: "Spirit",
+    aliases: ["spirit"],
+    nationality: "Pologne",
+    flag: "🇵🇱",
+    teams: [
+      { start: "2013-11-27", end: "2014-07-15", team: "MaxFloPlaY" },
+      { start: "2014-07-15", end: "2015-04-03", team: "Fnatic" },
+      { start: "2015-04-18", end: "2015-08-31", team: "BrawL eSports" },
+      { start: "2015-08-31", end: "2015-10-12", team: "Endurance eSports" },
+      { start: "2016-01-15", end: "2016-01-28", team: "Apocalypse eSports" },
+      { start: "2016-02-10", end: "2016-03-13", team: "IsIMBA" },
+      { start: "2016-03-13", end: "2017-06-12", team: "True eSport" },
+      { start: "2017-06-12", end: "2017-07-03", team: "Next Gaming" },
+      { start: "2017-07-03", end: "2017-08-06", team: "IsIMBA" },
+      { start: "2017-08-06", end: "2018-06-20", team: "OSC Elite" },
+      { start: "2018-06-20", end: "2019-01-02", team: "Wind and Rain" },
+      { start: "2019-01-02", end: "2019-02-12", team: "Iron Chain" },
+      { start: "2019-02-12", end: "2020-09-01", team: "Mkers" },
+      { start: "2020-09-01", end: "2020-11-04", team: "Kosmos Esports" },
+      { start: "2020-11-04", end: "2021-08-01", team: "Cascade" },
+      { start: "2021-08-02", end: "2021-09-15", team: "Berserker eSports" },
+      { start: "2021-09-15", end: "2023-03-09", team: "KaiZi Gaming" }
+    ]
+  },
+  {
+    id: "zoun",
+    name: "Zoun",
+    aliases: ["zoun", "fox"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2014-11-01", end: "2015-05-08", team: "Prime" },
+      { start: "2015-05-08", end: "2016-10-18", team: "SK Telecom T1" },
+      { start: "2020-02-08", end: "2023-03-13", team: "Alpha X" },
+      { start: "2025-04-13", end: "2026-03-06", team: "Team Vitality" },
+      { start: "2026-03-06", end: "Présent",    team: "ONSYDE" }
+    ]
+  },
+  {
+    id: "classic",
+    name: "Classic",
+    aliases: ["classic"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010-10-13", end: "2013-08-31", team: "STX SouL" },
+      { start: "2013-08-31", end: "2016-10-18", team: "SK Telecom T1" },
+      { start: "2018-07-25", end: "2019-01-20", team: "The Gosu Crew" },
+      { start: "2019-04-30", end: "2019-11-23", team: "Mkers" },
+      { start: "2019-11-23", end: "2021-08-01", team: "Service militaire" },
+      { start: "2021-08-01", end: "2022-05-31", team: "Alpha X" },
+      { start: "2022-08-10", end: "2022-11-15", team: "PREP eSPORTS" },
+      { start: "2023-03-14", end: "2023-04-09", team: "Mystery Gaming" },
+      { start: "2023-06-15", end: "2024-12-09", team: "Twisted Minds" },
+      { start: "2025-04-21", end: "Présent",    team: "Virtus.pro" }
+    ]
+  },
+  {
+    id: "elazer",
+    name: "Elazer",
+    aliases: ["elazer"],
+    nationality: "Belgique",
+    flag: "🇧🇪",
+    teams: [
+      { start: "2013-12-03", end: "2015-03-19", team: "AT Gaming" },
+      { start: "2015-03-19", end: "2016-12-02", team: "True eSport" },
+      { start: "2017-08-03", end: "2018-11-25", team: "Team QLASH" },
+      { start: "2018-11-26", end: "2022-05-11", team: "x-kom AGO" },
+      { start: "2022-05-13", end: "2025-09-30", team: "Team Liquid" }
+    ]
+  },
+  {
+    id: "lambo",
+    name: "Lambo",
+    aliases: ["lambo"],
+    nationality: "Allemagne",
+    flag: "🇩🇪",
+    teams: [
+      { start: "2014-01-30", end: "2015-06-08", team: "ALTERNATE" },
+      { start: "2015-06-08", end: "2017-01-16", team: "Invasion eSport" },
+      { start: "2017-11-08", end: "2020-03-13", team: "Team QLASH" },
+      { start: "2021-02-19", end: "Présent",    team: "Shopify Rebellion" }
+    ]
+  },
+  {
+    id: "heromarine",
+    name: "HeroMarine",
+    aliases: ["heromarine", "heroamarine"],
+    nationality: "Allemagne",
+    flag: "🇩🇪",
+    teams: [
+      { start: "2011-11-06", end: "Présent", team: "MOUZ" }
+    ]
+  },
+  {
+    id: "scarlett",
+    name: "Scarlett",
+    aliases: ["scarlett"],
+    nationality: "Canada",
+    flag: "🇨🇦",
+    teams: [
+      { start: "2012-04-16", end: "2012-05-12", team: "Eclypsia" },
+      { start: "2012-06-21", end: "2016-03-01", team: "Team Acer" },
+      { start: "2016-06-17", end: "2016-08-17", team: "Dead Pixels" },
+      { start: "2016-08-17", end: "2018-11-10", team: "Tollenz Lions" },
+      { start: "2018-11-10", end: "2020-03-23", team: "Newbee" },
+      { start: "2020-04-09", end: "2020-11-08", team: "Brave Star Gaming" },
+      { start: "2021-02-19", end: "Présent",    team: "Shopify Rebellion" }
+    ]
+  },
+  {
+    id: "creator",
+    name: "Creator",
+    aliases: ["creator"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011-01-01", end: "2015-07-20", team: "Prime" },
+      { start: "2015-11-17", end: "2020-11-30", team: "Jin Air Green Wings" },
+      { start: "2020-11-30", end: "2023-03-10", team: "Club NV" },
+      { start: "2023-03-10", end: "2023-08-14", team: "ABYDOS" },
+      { start: "2023-08-14", end: "2024-05-31", team: "Club NV" },
+      { start: "2024-05-31", end: "2024-10-31", team: "Blacklist" },
+      { start: "2025-05-15", end: "2025-06-28", team: "AlQadsiah Esports" }
+    ]
+  },
+  {
+    id: "trap",
+    name: "Trap",
+    aliases: ["trap"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2008-03-05", end: "2013-12-14", team: "SouL" },
+      { start: "2013-12-14", end: "2014-07-23", team: "Incredible Miracle" },
+      { start: "2014-09-17", end: "2020-11-30", team: "Jin Air Green Wings" },
+      { start: "2020-12-31", end: "2022-10-25", team: "Freecs" },
+      { start: "2022-10-25", end: "2024-04-24", team: "Service militaire" },
+      { start: "2024-06-01", end: "2024-12-01", team: "Gen.G Esports" }
+    ]
+  },
+  {
+    id: "neeb",
+    name: "Neeb",
+    aliases: ["neeb"],
+    nationality: "États-Unis",
+    flag: "🇺🇸",
+    teams: [
+      { start: "2013-03-27", end: "2013-08-16", team: "FXOpen e-Sports" },
+      { start: "2013-12-27", end: "2014-11-04", team: "Fnatic" },
+      { start: "2016-04-23", end: "2022-03-15", team: "Ting" },
+      { start: "2022-05-22", end: "2023-03-01", team: "ONSYDE GAMING" }
+    ]
+  },
+  {
+    id: "krystianer",
+    name: "Krystianer",
+    aliases: ["krystianer"],
+    nationality: "Pologne",
+    flag: "🇵🇱",
+    teams: [
+      { start: "2017-06-17", end: "2017-09-04", team: "Next Gaming" },
+      { start: "2017-09-04", end: "2018-01-19", team: "Prophecy E-sports" },
+      { start: "2018-01-19", end: "2019-02-07", team: "Exeed Esports" },
+      { start: "2019-02-07", end: "2019-02-12", team: "Iron Chain" },
+      { start: "2019-02-12", end: "2019-06-13", team: "Mkers" },
+      { start: "2019-06-13", end: "2019-07-07", team: "Wolf's Pack" },
+      { start: "2019-07-19", end: "2024-04-08", team: "Team Blacer" },
+      { start: "2024-04-08", end: "2024-08-04", team: "Starlight Twinkle" },
+      { start: "2024-11-01", end: "2026-03-06", team: "OFFSYDE Esports" },
+      { start: "2026-03-06", end: "Présent",    team: "ONSYDE" }
+    ]
+  },
+  {
+    id: "life",
+    name: "Life",
+    aliases: ["life"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011", end: "2012", team: "ZeNEX" },
+      { start: "2012", end: "2015", team: "StarTale" },
+      { start: "2015", end: "2016", team: "KT Rolster" },
+      { start: "2016", end: "2016", team: "Afreeca Freecs" }
+    ]
+  },
+  {
+    id: "hyun",
+    name: "HyuN",
+    aliases: ["hyun"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2006", end: "2011", team: "MBCGame HERO" },
+      { start: "2011", end: "2013", team: "Team SCV Life" },
+      { start: "2013", end: "2014", team: "Quantic Gaming" },
+      { start: "2014", end: "2016", team: "Team ROCCAT" },
+      { start: "2016", end: "2016", team: "Jin Air Green Wings" }
+    ]
+  },
+  {
+    id: "flash",
+    name: "Flash",
+    aliases: ["flash"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2007", end: "2015", team: "KT Rolster" }
+    ]
+  },
+  {
+    id: "innovation",
+    name: "INnoVation",
+    aliases: ["innovation"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2008", end: "2013", team: "STX SouL" },
+      { start: "2013", end: "2014", team: "Team Acer" },
+      { start: "2014", end: "2016", team: "SK Telecom T1" },
+      { start: "2018", end: "2018", team: "O'Gaming TV" }
+    ]
+  },
+  {
+    id: "jaedong",
+    name: "Jaedong",
+    aliases: ["jaedong"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011", end: "2012", team: "8th Team" },
+      { start: "2012", end: "2016", team: "Evil Geniuses" }
+    ]
+  },
+  {
+    id: "naniwa",
+    name: "NaNiwa",
+    aliases: ["naniwa"],
+    nationality: "Suède",
+    flag: "🇸🇪",
+    teams: [
+      { start: "2010", end: "2010", team: "mTw" },
+      { start: "2010", end: "2010", team: "Serious Gaming" },
+      { start: "2010", end: "2010", team: "Meet Your Makers" },
+      { start: "2010", end: "2010", team: "Power Gaming" },
+      { start: "2010", end: "2011", team: "Team Empire" },
+      { start: "2011", end: "2011", team: "Team Dignitas" },
+      { start: "2011", end: "2011", team: "compLexity Gaming" },
+      { start: "2011", end: "2012", team: "Quantic Gaming" },
+      { start: "2013", end: "2014", team: "Alliance" },
+      { start: "2015", end: "2015", team: "Team Property" }
+    ]
+  },
+  {
+    id: "mc",
+    name: "MC",
+    aliases: ["mc"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010", end: "2010", team: "MBCGame HERO" },
+      { start: "2010", end: "2012", team: "Old Generations" },
+      { start: "2011", end: "2013", team: "SK Gaming" }
+    ]
+  },
+  {
+    id: "mma",
+    name: "MMA",
+    aliases: ["mma"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2008", end: "2009", team: "SK Telecom T1" },
+      { start: "2010", end: "2012", team: "SlayerS" },
+      { start: "2012", end: "2015", team: "Team Acer" },
+      { start: "2015", end: "2015", team: "SBENU" },
+      { start: "2015", end: "2017", team: "Service militaire" },
+      { start: "2017", end: "2018", team: "Team expert" }
+    ]
+  },
+  {
+    id: "taeja",
+    name: "TaeJa",
+    aliases: ["taeja"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010", end: "2010", team: "NEX" },
+      { start: "2010", end: "2011", team: "ZeNEX" },
+      { start: "2011", end: "2012", team: "SlayerS" },
+      { start: "2012", end: "2016", team: "Team Liquid" },
+      { start: "2018", end: "2021", team: "Team Liquid" }
+    ]
+  },
+  {
+    id: "polt",
+    name: "Polt",
+    aliases: ["polt"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010", end: "2011", team: "Prime" },
+      { start: "2011", end: "2012", team: "Team SCV Life" },
+      { start: "2013", end: "2016", team: "CM Storm" },
+      { start: "2016", end: "2016", team: "Team EnVyUs" },
+      { start: "2016", end: "2019", team: "Service militaire" }
+    ]
+  },
+  {
+    id: "forgg",
+    name: "ForGG",
+    aliases: ["forgg"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2011", end: "2012", team: "oGs" },
+      { start: "2012", end: "2015", team: "Millenium" }
+    ]
+  },
+  {
+    id: "stephano",
+    name: "Stephano",
+    aliases: ["stephano"],
+    nationality: "France",
+    flag: "🇫🇷",
+    teams: [
+      { start: "2010-08-29", end: "2010-10-03", team: "ToY Gaming" },
+      { start: "2010-10-07", end: "2012-09-10", team: "Millenium" },
+      { start: "2012-09-10", end: "2013-08-06", team: "Evil Geniuses" },
+      { start: "2014-05-15", end: "2017-12-20", team: "Meltdown" },
+      { start: "2017-12-28", end: "2021-01-21", team: "GamersOrigin" }
+    ]
+  },
+  {
+    id: "huk",
+    name: "HuK",
+    aliases: ["huk"],
+    nationality: "Canada",
+    flag: "🇨🇦",
+    teams: [
+      { start: "2010", end: "2010-06-17", team: "vT Gaming" },
+      { start: "2010-06-17", end: "2010-09-25", team: "Millenium" },
+      { start: "2010-09-25", end: "2011-08-16", team: "Team Liquid" },
+      { start: "2011-08-16", end: "2017-01-01", team: "Evil Geniuses" }
+    ]
+  },
+  {
+    id: "dark",
+    name: "Dark",
+    aliases: ["dark"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2012", end: "2012-11", team: "SlayerS" },
+      { start: "2012-11", end: "2016-10-18", team: "T1" },
+      { start: "2018-10-24", end: "2019-10-02", team: "The Gosu Crew" },
+      { start: "2019-10-07", end: "2023-03-13", team: "Dragon Phoenix Gaming" },
+      { start: "2023-03-13", end: "2024-01-14", team: "Weibo Gaming" },
+      { start: "2024-01-30", end: "2024-11-30", team: "Talon Esports" }
+    ]
+  },
+  {
+    id: "zest",
+    name: "Zest",
+    aliases: ["zest"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010", end: "2011", team: "WeMade FOX" },
+      { start: "2011", end: "2016", team: "KT Rolster" },
+      { start: "2018-08-22", end: "2019-01-04", team: "Scythe Esports" },
+      { start: "2019-01-20", end: "2019-11-12", team: "Ocean Gaming" },
+      { start: "2020-01-28", end: "2021-02-02", team: "RYE Gaming" },
+      { start: "2021-02-08", end: "2022-06-19", team: "Dragon Phoenix Gaming" }
+    ]
+  },
+  {
+    id: "gumiho",
+    name: "GuMiho",
+    aliases: ["gumiho"],
+    nationality: "Corée du Sud",
+    flag: "🇰🇷",
+    teams: [
+      { start: "2010-10-07", end: "2011-07-18", team: "For Our Utopia" },
+      { start: "2011-07-18", end: "2013-11-01", team: "FXOpen e-Sports" },
+      { start: "2013-11-01", end: "2013-12-25", team: "For Our Utopia" },
+      { start: "2014-01-27", end: "2014-09-01", team: "CJ Entus" },
+      { start: "2014-11-11", end: "2015-04-24", team: "Invasion eSport" },
+      { start: "2015-04-24", end: "2016-12-03", team: "MVP" },
+      { start: "2017-02-03", end: "2019-11-14", team: "PSISTORM Gaming" },
+      { start: "2019-12-31", end: "2021-07-01", team: "Service militaire" },
+      { start: "2021-07-01", end: "2023-02-24", team: "PSISTORM Gaming" },
+      { start: "2023-11-01", end: "2024-11-16", team: "Cloud9" },
+      { start: "2025-05-06", end: "2025-08-21", team: "S8UL Esports" }
+    ]
+  }
+];
+
+/* ========================================================================== */
+
+let current = null;
+let lastId = null;
+let revealedTeams = 1;   // combien d'équipes sont visibles dès le départ
+let nationalityRevealed = false;
+let attempts = 0;
+let won = false;
+let lang = 'fr';
+
+const clueList      = document.getElementById('clueList');
+const revealBtn      = document.getElementById('revealBtn');
+const giveUpBtn      = document.getElementById('giveUpBtn');
+const guessInput     = document.getElementById('guessInput');
+const submitBtn      = document.getElementById('submitBtn');
+const feedback       = document.getElementById('feedback');
+const winBanner      = document.getElementById('winBanner');
+const stampText      = document.getElementById('stampText');
+const winLead        = document.getElementById('winLead');
+const winName        = document.getElementById('winName');
+const winClues       = document.getElementById('winClues');
+const winAttempts    = document.getElementById('winAttempts');
+const winFoundWith   = document.getElementById('winFoundWith');
+const newGameBtn     = document.getElementById('newGameBtn');
+const newGameBtnTop  = document.getElementById('newGameBtnTop');
+const statAttempts   = document.getElementById('statAttempts');
+const statClues      = document.getElementById('statClues');
+const lblAttempts    = document.getElementById('lblAttempts');
+const lblClues       = document.getElementById('lblClues');
+const subtitleEl     = document.getElementById('subtitleEl');
+const dossierTabLabel = document.getElementById('dossierTabLabel');
+const guessPanelLabel = document.getElementById('guessPanelLabel');
+const tabPlayerBtn   = document.getElementById('tabPlayerBtn');
+const tabTeamBtn     = document.getElementById('tabTeamBtn');
+const langFrBtn      = document.getElementById('langFrBtn');
+const langEnBtn      = document.getElementById('langEnBtn');
+const footerText     = document.getElementById('footerText');
+
+/* ==========================================================================
+   TRADUCTIONS (FR / EN)
+   ========================================================================== */
+const STRINGS = {
+  fr: {
+    tabPlayer: "🕵️ Deviner le joueur",
+    tabTeam: "🏳️ Deviner l'équipe",
+    newGame: "🔄 Nouvelle partie",
+    attempts: "TENTATIVES",
+    cluesUsed: "INDICES UTILISÉS",
+    subtitlePlayer: "Identifiez le joueur à partir de son parcours en équipe",
+    subtitleTeam: "Identifiez l\u2019équipe à partir de ses recrues au fil du temps",
+    placeholderPlayer: "Nom du joueur…",
+    placeholderTeam: "Nom de l\u2019équipe…",
+    dossierTab: "DOSSIER CONFIDENTIEL",
+    yourAnswer: "VOTRE RÉPONSE",
+    validate: "Valider",
+    giveUp: "Abandonner",
+    teamLabel: n => "ÉQUIPE " + n,
+    formerPlayerLabel: n => "ANCIEN JOUEUR Nº" + n,
+    currentPlayerLabel: n => "JOUEUR ACTUEL Nº" + n,
+    nationalityLabel: "NATIONALITÉ",
+    revealNextTeamOf: n => "Révéler l\u2019équipe " + n,
+    revealNationality: "Révéler la nationalité",
+    revealNextRecruit: "Révéler la recrue suivante",
+    noMoreClues: "Aucun indice restant",
+    wrongPlayer: "Ce n\u2019est pas la bonne réponse.",
+    wrongTeam: "Ce n\u2019est pas la bonne équipe.",
+    identifiedM: "IDENTIFIÉ",
+    identifiedF: "IDENTIFIÉE",
+    abandon: "ABANDON",
+    winLeadPlayer: "Le joueur était bien",
+    winLeadTeam: "L\u2019équipe était bien",
+    winLeadGiveUp: "Il fallait trouver",
+    foundWith: (c, a) => "Trouvé avec <b>" + c + "</b> indice(s) et <b>" + a + "</b> tentative(s).",
+    footer: "Deux jeux dans un : devinez un joueur à partir de son parcours en équipe, ou devinez une équipe à partir des joueurs qui l'ont rejointe au fil du temps. Basé sur le top 25 aligulac actuel et des légendes de chaque grande époque."
+  },
+  en: {
+    tabPlayer: "🕵️ Guess the player",
+    tabTeam: "🏳️ Guess the team",
+    newGame: "🔄 New game",
+    attempts: "ATTEMPTS",
+    cluesUsed: "CLUES USED",
+    subtitlePlayer: "Identify the player from their team career",
+    subtitleTeam: "Identify the team from its recruits over time",
+    placeholderPlayer: "Player name…",
+    placeholderTeam: "Team name…",
+    dossierTab: "CLASSIFIED DOSSIER",
+    yourAnswer: "YOUR ANSWER",
+    validate: "Submit",
+    giveUp: "Give up",
+    teamLabel: n => "TEAM " + n,
+    formerPlayerLabel: n => "FORMER PLAYER #" + n,
+    currentPlayerLabel: n => "CURRENT PLAYER #" + n,
+    nationalityLabel: "NATIONALITY",
+    revealNextTeamOf: n => "Reveal team " + n,
+    revealNationality: "Reveal nationality",
+    revealNextRecruit: "Reveal next recruit",
+    noMoreClues: "No clues left",
+    wrongPlayer: "That\u2019s not the right answer.",
+    wrongTeam: "That\u2019s not the right team.",
+    identifiedM: "IDENTIFIED",
+    identifiedF: "IDENTIFIED",
+    abandon: "GAVE UP",
+    winLeadPlayer: "The player was",
+    winLeadTeam: "The team was",
+    winLeadGiveUp: "The answer was",
+    foundWith: (c, a) => "Found with <b>" + c + "</b> clue(s) and <b>" + a + "</b> attempt(s).",
+    footer: "Two games in one: guess a player from their team career, or guess a team from the players who joined it over time. Based on the current aligulac top 25 and legends from every era."
+  }
+};
+
+// Traduction des nationalités (stockées en français dans PLAYERS)
+const NAT_EN = {
+  "France": "France",
+  "Finlande": "Finland",
+  "Italie": "Italy",
+  "Belgique": "Belgium",
+  "Corée du Sud": "South Korea",
+  "Danemark": "Denmark",
+  "Pologne": "Poland",
+  "Allemagne": "Germany",
+  "Canada": "Canada",
+  "Suède": "Sweden",
+  "États-Unis": "United States"
+};
+
+function nationalityLabel(nat){
+  return lang === 'en' ? (NAT_EN[nat] || nat) : nat;
+}
+
+function normalize(str){
+  return str
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function pickPlayer(){
+  let pool = PLAYERS;
+  if (PLAYERS.length > 1) pool = PLAYERS.filter(p => p.id !== lastId);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function newGame(){
+  current = pickPlayer();
+  lastId = current.id;
+  revealedTeams = 1;
+  nationalityRevealed = false;
+  attempts = 0;
+  won = false;
+
+  guessInput.value = '';
+  guessInput.disabled = false;
+  submitBtn.disabled = false;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  winBanner.classList.remove('show', 'lose');
+  revealBtn.disabled = false;
+
+  render();
+  guessInput.focus();
+}
+
+function render(){
+  clueList.innerHTML = '';
+
+  current.teams.forEach((t, i) => {
+    const row = document.createElement('div');
+    const isRevealed = i < revealedTeams;
+    row.className = 'clue-row' + (isRevealed ? ' revealed' : ' locked');
+
+    const idx = document.createElement('div');
+    idx.className = 'clue-index';
+    idx.textContent = String(i + 1).padStart(2, '0');
+
+    const body = document.createElement('div');
+    body.className = 'clue-body';
+
+    const label = document.createElement('div');
+    label.className = 'clue-label';
+    label.textContent = STRINGS[lang].teamLabel(i + 1);
+
+    const value = document.createElement('div');
+    value.className = 'clue-value';
+
+    if (isRevealed){
+      value.innerHTML =
+        '<span class="clue-dates">' + t.start + ' → ' + t.end + '</span>' +
+        '<span class="clue-team">' + t.team + '</span>';
+    } else {
+      value.innerHTML = '<span class="lock-icon">🔒</span><span class="redacted" style="width:120px;"></span>';
+    }
+
+    body.appendChild(label);
+    body.appendChild(value);
+    row.appendChild(idx);
+    row.appendChild(body);
+    clueList.appendChild(row);
+  });
+
+  // ligne nationalité
+  const natRow = document.createElement('div');
+  natRow.className = 'clue-row nationality' + (nationalityRevealed ? ' revealed' : ' locked');
+
+  const natIdx = document.createElement('div');
+  natIdx.className = 'clue-index';
+  natIdx.textContent = '🌐';
+
+  const natBody = document.createElement('div');
+  natBody.className = 'clue-body';
+
+  const natLabel = document.createElement('div');
+  natLabel.className = 'clue-label';
+  natLabel.textContent = STRINGS[lang].nationalityLabel;
+
+  const natValue = document.createElement('div');
+  natValue.className = 'clue-value';
+  if (nationalityRevealed){
+    natValue.innerHTML = current.flag + ' ' + nationalityLabel(current.nationality);
+  } else {
+    natValue.innerHTML = '<span class="lock-icon">🔒</span><span class="redacted" style="width:90px;"></span>';
+  }
+
+  natBody.appendChild(natLabel);
+  natBody.appendChild(natValue);
+  natRow.appendChild(natIdx);
+  natRow.appendChild(natBody);
+  clueList.appendChild(natRow);
+
+  // bouton "indice suivant"
+  if (revealedTeams < current.teams.length){
+    revealBtn.textContent = STRINGS[lang].revealNextTeamOf(revealedTeams + 1);
+    revealBtn.disabled = false;
+  } else if (!nationalityRevealed){
+    revealBtn.textContent = STRINGS[lang].revealNationality;
+    revealBtn.disabled = false;
+  } else {
+    revealBtn.textContent = STRINGS[lang].noMoreClues;
+    revealBtn.disabled = true;
+  }
+
+  statAttempts.textContent = attempts;
+  statClues.textContent = revealedTeams + (nationalityRevealed ? 1 : 0);
+}
+
+function revealNext(){
+  if (won) return;
+  if (revealedTeams < current.teams.length){
+    revealedTeams++;
+  } else if (!nationalityRevealed){
+    nationalityRevealed = true;
+  }
+  render();
+}
+
+function submitGuess(){
+  if (won) return;
+  const raw = guessInput.value.trim();
+  if (!raw) return;
+
+  attempts++;
+  const guess = normalize(raw);
+  const isCorrect = current.aliases.some(a => normalize(a) === guess) || normalize(current.name) === guess;
+
+  if (isCorrect){
+    win();
+  } else {
+    feedback.textContent = STRINGS[lang].wrongPlayer;
+    feedback.className = 'feedback wrong';
+    guessInput.classList.remove('shake');
+    void guessInput.offsetWidth;
+    guessInput.classList.add('shake');
+    statAttempts.textContent = attempts;
+  }
+}
+
+function win(){
+  won = true;
+  revealedTeams = current.teams.length;
+  nationalityRevealed = true;
+  render();
+
+  guessInput.disabled = true;
+  submitBtn.disabled = true;
+  revealBtn.disabled = true;
+
+  feedback.textContent = '';
+  stampText.textContent = STRINGS[lang].identifiedM;
+  winLead.textContent = STRINGS[lang].winLeadPlayer;
+  winName.textContent = current.name;
+  const clues = current.teams.length + (nationalityRevealed ? 1 : 0);
+  winFoundWith.innerHTML = STRINGS[lang].foundWith(clues, attempts);
+  winBanner.classList.add('show');
+}
+
+function giveUp(){
+  if (won) return;
+  win();
+  stampText.textContent = STRINGS[lang].abandon;
+  winLead.textContent = STRINGS[lang].winLeadGiveUp;
+  winName.textContent = current.name;
+  winBanner.classList.add('lose');
+}
+
+/* ==========================================================================
+   BASE DE DONNÉES DES ÉQUIPES (pour le mode "Deviner l'équipe")
+   Liste indépendante du tableau PLAYERS. Pour chaque équipe : son effectif,
+   avec la date d'arrivée et de départ ("Présent" pour les joueurs actuels).
+   Les anciens joueurs sont révélés en premier, puis les joueurs actuels.
+   ========================================================================== */
+const TEAMS = [
+  {
+    id: "teamliquid",
+    name: "Team Liquid",
+    aliases: ["team liquid", "liquid", "tl"],
+    players: [
+      { name: "HuK",   start: "2010-09-25", end: "2011-08-16" },
+      { name: "TaeJa", start: "2012-03-28", end: "2016-06-02" },
+      { name: "TaeJa", start: "2018-09-24", end: "2021-05-12" },
+      { name: "Elazer", start: "2022-05-13", end: "2025-09-30" },
+      { name: "Clem",  start: "2020-02-21", end: "Présent" },
+      { name: "Cure",  start: "2023-10-21", end: "Présent" }
+    ]
+  },
+  {
+    id: "jinair",
+    name: "Jin Air Green Wings",
+    aliases: ["jin air green wings", "jag", "jinair"],
+    players: [
+      { name: "Cure",    start: "2013-07-10", end: "2019-12-02" },
+      { name: "Rogue",   start: "2013-07-10", end: "2020-11-30" },
+      { name: "Maru",    start: "2013-12-13", end: "2020-11-30" },
+      { name: "Trap",    start: "2014-09-17", end: "2020-11-30" },
+      { name: "Creator", start: "2015-11-17", end: "2019-12-02" },
+      { name: "HyuN",    start: "2016-03-25", end: "2016-11-30" }
+    ]
+  },
+  {
+    id: "onsyde",
+    name: "ONSYDE",
+    aliases: ["onsyde"],
+    players: [
+      { name: "Maru",       start: "2022-03-31", end: "2024-02-01" },
+      { name: "Maru",       start: "2026-03-06", end: "Présent" },
+      { name: "Zoun",       start: "2026-03-06", end: "Présent" },
+      { name: "Krystianer", start: "2026-03-06", end: "Présent" },
+      { name: "SHIN",       start: "2026-06-25", end: "Présent" }
+    ]
+  },
+  {
+    id: "dragonphoenix",
+    name: "Dragon Phoenix Gaming",
+    aliases: ["dragon phoenix gaming", "dpg"],
+    players: [
+      { name: "Dark",  start: "2019-10-07", end: "2023-03-13" },
+      { name: "Cure",  start: "2019-12-02", end: "2023-02-23" },
+      { name: "Rogue", start: "2020-11-30", end: "2022-10-05" },
+      { name: "Zest",  start: "2021-02-08", end: "2022-06-19" },
+      { name: "herO",  start: "2021-06-24", end: "2023-03-13" }
+    ]
+  },
+  {
+    id: "shopify",
+    name: "Shopify Rebellion",
+    aliases: ["shopify rebellion", "shopify"],
+    players: [
+      { name: "ByuN",     start: "2021-02-19", end: "Présent" },
+      { name: "Lambo",    start: "2021-02-19", end: "Présent" },
+      { name: "Scarlett", start: "2021-02-19", end: "Présent" }
+    ]
+  },
+  {
+    id: "evilgeniuses",
+    name: "Evil Geniuses",
+    aliases: ["evil geniuses", "eg"],
+    players: [
+      { name: "HuK",      start: "2011-08-16", end: "2017-01-01" },
+      { name: "Stephano", start: "2012-09-10", end: "2013-08-06" },
+      { name: "Jaedong",  start: "2012-12-05", end: "2016-11-01" }
+    ]
+  },
+  {
+    id: "slayers",
+    name: "SlayerS",
+    aliases: ["slayers"],
+    players: [
+      { name: "MMA",   start: "2010-11-30", end: "2012-11-03" },
+      { name: "TaeJa", start: "2011-05-01", end: "2012-03-12" },
+      { name: "Dark",  start: "2012",       end: "2012-11" }
+    ]
+  },
+  {
+    id: "stxsoul",
+    name: "STX SouL",
+    aliases: ["stx soul", "stx", "soul"],
+    players: [
+      { name: "Trap",       start: "2008-03-05", end: "2013-12-14" },
+      { name: "INnoVation", start: "2008-08-13", end: "2013-08-31" },
+      { name: "Classic",    start: "2010-10-13", end: "2013-08-31" }
+    ]
+  },
+  {
+    id: "ktrolster",
+    name: "KT Rolster",
+    aliases: ["kt rolster", "kt"],
+    players: [
+      { name: "Flash", start: "2007",       end: "2015-12-01" },
+      { name: "Zest",  start: "2011-11-04", end: "2016-10-18" },
+      { name: "Life",  start: "2015-02-11", end: "2016-01-28" }
+    ]
+  },
+  {
+    id: "millenium",
+    name: "Millenium",
+    aliases: ["millenium", "millennium"],
+    players: [
+      { name: "HuK",      start: "2010-06-17", end: "2010-09-25" },
+      { name: "Stephano", start: "2010-10-07", end: "2012-09-10" },
+      { name: "ForGG",    start: "2012-09-10", end: "2015" }
+    ]
+  },
+  {
+    id: "alphax",
+    name: "Alpha X",
+    aliases: ["alpha x", "alphax"],
+    players: [
+      { name: "Zoun",    start: "2020-02-08", end: "2023-03-13" },
+      { name: "SHIN",    start: "2020-06-30", end: "2023-05-13" },
+      { name: "Classic", start: "2021-08-01", end: "2022-05-31" }
+    ]
+  },
+  {
+    id: "teamvitality",
+    name: "Team Vitality",
+    aliases: ["team vitality", "vitality"],
+    players: [
+      { name: "Solar", start: "2024-02-01", end: "2024-10-01" },
+      { name: "Maru",  start: "2024-02-01", end: "2026-03-06" },
+      { name: "Zoun",  start: "2025-04-13", end: "2026-03-06" }
+    ]
+  },
+  {
+    id: "cjentus",
+    name: "CJ Entus",
+    aliases: ["cj entus", "cj"],
+    players: [
+      { name: "herO",   start: "2011-11-04", end: "2016-10-18" },
+      { name: "GuMiho", start: "2014-01-27", end: "2014-09-01" },
+      { name: "SHIN",   start: "2015-01-22", end: "2016-10-18" }
+    ]
+  },
+  {
+    id: "weibogaming",
+    name: "Weibo Gaming",
+    aliases: ["weibo gaming", "weibo"],
+    players: [
+      { name: "herO", start: "2023-03-13", end: "2025-02-27" },
+      { name: "Dark", start: "2023-03-13", end: "2024-01-14" },
+      { name: "SHIN", start: "2025-04-15", end: "2026-01-12" }
+    ]
+  },
+  {
+    id: "teamqlash",
+    name: "Team QLASH",
+    aliases: ["team qlash", "qlash"],
+    players: [
+      { name: "Elazer", start: "2017-08-03", end: "2018-11-25" },
+      { name: "Lambo",  start: "2017-11-08", end: "2020-03-13" },
+      { name: "Reynor", start: "2020-02-15", end: "2022-03-21" }
+    ]
+  },
+  {
+    id: "prime",
+    name: "Prime",
+    aliases: ["prime"],
+    players: [
+      { name: "Polt",    start: "2010",       end: "2011-09-14" },
+      { name: "ByuN",    start: "2011-10-08", end: "2015-10-18" },
+      { name: "Creator", start: "2011",       end: "2015-07-20" },
+      { name: "Zoun",    start: "2014-11-01", end: "2015-05-08" }
+    ]
+  }
+];
+
+function isTeamMatch(guessNorm, team){
+  if (normalize(team.name) === guessNorm) return true;
+  return team.aliases.some(a => normalize(a) === guessNorm);
+}
+
+function buildTeamDB(){
+  return TEAMS.map(team => {
+    const former = team.players.filter(p => p.end !== 'Présent')
+      .slice().sort((a, b) => (a.start > b.start ? 1 : a.start < b.start ? -1 : 0));
+    const current = team.players.filter(p => p.end === 'Présent')
+      .slice().sort((a, b) => (a.start > b.start ? 1 : a.start < b.start ? -1 : 0));
+    return { id: team.id, name: team.name, aliases: team.aliases, entries: former.concat(current) };
+  });
+}
+
+const TEAM_DB = buildTeamDB();
+
+let tCurrent = null, tLastName = null, tRevealed = 1, tAttempts = 0, tWon = false;
+
+
+function pickTeam(){
+  let pool = TEAM_DB;
+  if (TEAM_DB.length > 1) pool = TEAM_DB.filter(t => t.name !== tLastName);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function newTeamGame(){
+  tCurrent = pickTeam();
+  tLastName = tCurrent.name;
+  tRevealed = 1;
+  tAttempts = 0;
+  tWon = false;
+
+  guessInput.value = '';
+  guessInput.disabled = false;
+  submitBtn.disabled = false;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  winBanner.classList.remove('show', 'lose');
+  revealBtn.disabled = false;
+
+  renderTeam();
+  guessInput.focus();
+}
+
+function renderTeam(){
+  clueList.innerHTML = '';
+
+  tCurrent.entries.forEach((e, i) => {
+    const row = document.createElement('div');
+    const isRevealed = i < tRevealed;
+    row.className = 'clue-row' + (isRevealed ? ' revealed' : ' locked');
+
+    const idx = document.createElement('div');
+    idx.className = 'clue-index';
+    idx.textContent = String(i + 1).padStart(2, '0');
+
+    const body = document.createElement('div');
+    body.className = 'clue-body';
+
+    const label = document.createElement('div');
+    label.className = 'clue-label';
+    label.textContent = (e.end === 'Présent' ? STRINGS[lang].currentPlayerLabel(i + 1) : STRINGS[lang].formerPlayerLabel(i + 1));
+
+    const value = document.createElement('div');
+    value.className = 'clue-value';
+
+    if (isRevealed){
+      value.innerHTML =
+        '<span class="clue-dates">' + e.start + ' → ' + e.end + '</span>' +
+        '<span class="clue-team">' + e.name + '</span>';
+    } else {
+      value.innerHTML = '<span class="lock-icon">🔒</span><span class="redacted" style="width:120px;"></span>';
+    }
+
+    body.appendChild(label);
+    body.appendChild(value);
+    row.appendChild(idx);
+    row.appendChild(body);
+    clueList.appendChild(row);
+  });
+
+  if (tRevealed < tCurrent.entries.length){
+    revealBtn.textContent = STRINGS[lang].revealNextRecruit;
+    revealBtn.disabled = false;
+  } else {
+    revealBtn.textContent = STRINGS[lang].noMoreClues;
+    revealBtn.disabled = true;
+  }
+
+  statAttempts.textContent = tAttempts;
+  statClues.textContent = tRevealed;
+}
+
+function revealNextTeam(){
+  if (tWon) return;
+  if (tRevealed < tCurrent.entries.length) tRevealed++;
+  renderTeam();
+}
+
+function submitTeamGuess(){
+  if (tWon) return;
+  const raw = guessInput.value.trim();
+  if (!raw) return;
+
+  tAttempts++;
+  const guessNorm = normalize(raw);
+
+  if (isTeamMatch(guessNorm, tCurrent)){
+    winTeam();
+  } else {
+    feedback.textContent = STRINGS[lang].wrongTeam;
+    feedback.className = 'feedback wrong';
+    guessInput.classList.remove('shake');
+    void guessInput.offsetWidth;
+    guessInput.classList.add('shake');
+    statAttempts.textContent = tAttempts;
+  }
+}
+
+function winTeam(){
+  tWon = true;
+  tRevealed = tCurrent.entries.length;
+  renderTeam();
+
+  guessInput.disabled = true;
+  submitBtn.disabled = true;
+  revealBtn.disabled = true;
+
+  feedback.textContent = '';
+  stampText.textContent = STRINGS[lang].identifiedF;
+  winLead.textContent = STRINGS[lang].winLeadTeam;
+  winName.textContent = tCurrent.name;
+  winFoundWith.innerHTML = STRINGS[lang].foundWith(tRevealed, tAttempts);
+  winBanner.classList.add('show');
+}
+
+function giveUpTeam(){
+  if (tWon) return;
+  winTeam();
+  stampText.textContent = STRINGS[lang].abandon;
+  winLead.textContent = STRINGS[lang].winLeadGiveUp;
+  winName.textContent = tCurrent.name;
+  winBanner.classList.add('lose');
+}
+
+/* ==========================================================================
+   ROUTAGE ENTRE LES DEUX MODES + LANGUE
+   ========================================================================== */
+
+let mode = 'player';
+
+function applyStaticStrings(){
+  const s = STRINGS[lang];
+  tabPlayerBtn.textContent = s.tabPlayer;
+  tabTeamBtn.textContent = s.tabTeam;
+  newGameBtn.textContent = s.newGame;
+  newGameBtnTop.textContent = s.newGame;
+  lblAttempts.textContent = s.attempts;
+  lblClues.textContent = s.cluesUsed;
+  dossierTabLabel.textContent = s.dossierTab;
+  guessPanelLabel.textContent = s.yourAnswer;
+  submitBtn.textContent = s.validate;
+  giveUpBtn.textContent = s.giveUp;
+  footerText.textContent = s.footer;
+  subtitleEl.textContent = mode === 'player' ? s.subtitlePlayer : s.subtitleTeam;
+  guessInput.placeholder = mode === 'player' ? s.placeholderPlayer : s.placeholderTeam;
+}
+
+function setLanguage(next){
+  if (lang === next) return;
+  lang = next;
+  langFrBtn.classList.toggle('active', next === 'fr');
+  langEnBtn.classList.toggle('active', next === 'en');
+  applyStaticStrings();
+  mode === 'player' ? newGame() : newTeamGame();
+}
+
+function switchMode(next){
+  if (mode === next) return;
+  mode = next;
+  tabPlayerBtn.classList.toggle('active', next === 'player');
+  tabTeamBtn.classList.toggle('active', next === 'team');
+  applyStaticStrings();
+
+  if (next === 'player'){
+    newGame();
+  } else {
+    newTeamGame();
+  }
+}
+
+revealBtn.addEventListener('click', () => { mode === 'player' ? revealNext() : revealNextTeam(); });
+giveUpBtn.addEventListener('click', () => { mode === 'player' ? giveUp() : giveUpTeam(); });
+submitBtn.addEventListener('click', () => { mode === 'player' ? submitGuess() : submitTeamGuess(); });
+newGameBtn.addEventListener('click', () => { mode === 'player' ? newGame() : newTeamGame(); });
+newGameBtnTop.addEventListener('click', () => { mode === 'player' ? newGame() : newTeamGame(); });
+guessInput.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  mode === 'player' ? submitGuess() : submitTeamGuess();
+});
+tabPlayerBtn.addEventListener('click', () => switchMode('player'));
+tabTeamBtn.addEventListener('click', () => switchMode('team'));
+langFrBtn.addEventListener('click', () => setLanguage('fr'));
+langEnBtn.addEventListener('click', () => setLanguage('en'));
+
+applyStaticStrings();
+newGame();
+</script>
+
+</body>
+</html>
