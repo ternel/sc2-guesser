@@ -1386,175 +1386,199 @@ function giveUp(){
    Les anciens joueurs sont révélés en premier, puis les joueurs actuels.
    ========================================================================== */
 const TEAMS = [
+  // Source : Liquipedia (pages d'équipe, sections "Player Roster")
   {
-    id: "teamliquid",
-    name: "Team Liquid",
-    aliases: ["team liquid", "liquid", "tl"],
+    id: "teamliquid", name: "Team Liquid", aliases: ["team liquid", "liquid", "tl"],
     players: [
-      { name: "HuK",   start: "2010-09-25", end: "2011-08-16" },
-      { name: "TaeJa", start: "2012-03-28", end: "2016-06-02" },
-      { name: "TaeJa", start: "2018-09-24", end: "2021-05-12" },
-      { name: "Elazer", start: "2022-05-13", end: "2025-09-30" },
-      { name: "Clem",  start: "2020-02-21", end: "Présent" },
-      { name: "Cure",  start: "2023-10-21", end: "Présent" }
+      p("Jinro", "2010-03-29", "2012-08-07"), p("TLO", "2010-03-28", "2020-09-14"),
+      p("HayprO", "2010-07-02", "2012-09-20"), p("NonY", "2010-07-26", "2013-03-03"),
+      p("Ret", "2010-09-08", "2018-03-31"), p("HuK", "2010-09-25", "2011-08-16"),
+      p("Sheth", "2011-07-28", "2013-01-22"), p("HerO", "2011-08-10", "2016-02-14"),
+      p("Zenio", "2011-11-21", "2014-01-14"), p("TaeJa", "2012-03-29", "2016-06-02"),
+      p("Sea", "2012-10-04", "2012-12-17"), p("MaNa", "2014-02-21", "2026-04-12"),
+      p("LucifroN", "2016-01-13", "2016-07-15"), p("VortiX", "2016-01-13", "2016-07-15"),
+      p("uThermal", "2016-09-04", "2022-04-02"), p("TaeJa", "2018-09-24", "2021-05-12"),
+      p("Harstem", "2020-02-21", "2022-02-01"), p("Kelazhur", "2020-10-30", "2023-10-01"),
+      p("CranK", "2020-11-13", "2021-08-01"), p("Elazer", "2022-05-13", "2025-09-30"),
+      p("Snute", "2013-01-09"), p("Bunny", "2014-02-21"), p("Clem", "2020-02-21"),
+      p("SKillous", "2023-01-06"), p("Cure", "2023-10-21")
     ]
   },
   {
-    id: "jinair",
-    name: "Jin Air Green Wings",
-    aliases: ["jin air green wings", "jag", "jinair"],
+    id: "jinair", name: "Jin Air Green Wings", aliases: ["jin air green wings", "jin air", "jag", "jagw", "8th team"],
     players: [
-      { name: "Cure",    start: "2013-07-10", end: "2019-12-02" },
-      { name: "Rogue",   start: "2013-07-10", end: "2020-11-30" },
-      { name: "Maru",    start: "2013-12-13", end: "2020-11-30" },
-      { name: "Trap",    start: "2014-09-17", end: "2020-11-30" },
-      { name: "Creator", start: "2015-11-17", end: "2019-12-02" },
-      { name: "HyuN",    start: "2016-03-25", end: "2016-11-30" }
+      p("Jaedong", "2011-11-04", "2012-12-05"), p("TY", "2011-11-04", "2013-08-31"),
+      p("Rogue", "2011-11-04", "2020-11-30"), p("Pigbaby", "2012-04-12", "2014-04-10"),
+      p("TRUE", "2012-11-02", "2014-08-25"), p("MajOr", "2013-01-02", "2013-06-17"),
+      p("Argo", "2013-07-10", "2013-08-16"), p("Check", "2013-07-10", "2013-08-18"),
+      p("CoCa", "2013-07-10", "2014-03-11"), p("Terminator", "2013-07-10", "2015-10-31"),
+      p("Cure", "2013-07-10", "2019-12-02"), p("Pure", "2013-08-23", "2013-10-08"),
+      p("Maru", "2013-12-13", "2020-11-30"), p("sOs", "2013-12-13", "2020-11-30"),
+      p("Avenge", "2014-04-04", "2015-02-03"), p("Adios", "2014-04-10", "2015-05-08"),
+      p("Trap", "2014-09-17", "2020-11-30"), p("Symbol", "2014-11-28", "2015-10-31"),
+      p("Pigbaby", "2014-12-01", "2015-10-31"), p("Check", "2015-03-26", "2015-10-31"),
+      p("Creator", "2015-11-17", "2019-12-02"), p("HyuN", "2016-03-25", "2016-11-30"),
+      p("Rex", "2019-02-27", "2019-12-31"), p("Creator", "2019-12-10", "2020-11-30"),
+      p("Rex", "2020-08-10", "2020-11-30")
     ]
   },
   {
-    id: "onsyde",
-    name: "ONSYDE",
-    aliases: ["onsyde"],
+    id: "evilgeniuses", name: "Evil Geniuses", aliases: ["evil geniuses", "eg"],
     players: [
-      { name: "Maru",       start: "2022-03-31", end: "2024-02-01" },
-      { name: "Maru",       start: "2026-03-06", end: "Présent" },
-      { name: "Zoun",       start: "2026-03-06", end: "Présent" },
-      { name: "Krystianer", start: "2026-03-06", end: "Présent" },
-      { name: "SHIN",       start: "2026-06-25", end: "Présent" }
+      p("iNcontroL", "2009-04-12", "2017-01-01"), p("LzGaMeR", "2009-04-11", "2013-02-03"),
+      p("Machine", "2009-04-11", "2014-02-04"), p("iNkA", "2009-07-31", "2011-01-31"),
+      p("Axslav", "2010-06-30", "2012-01-17"), p("StrifeCro", "2010-06-30", "2012-01-17"),
+      p("IdrA", "2010-09-08", "2013-05-08"), p("Tasteless", "2010-09-08", "2011-03-30"),
+      p("DeMusliM", "2011-01-04", "2015-02-01"), p("Grubby", "2011-02-10", "2011-03-30"),
+      p("PuMa", "2011-07-25", "2013-03-14"), p("HuK", "2011-08-17", "2017-01-01"),
+      p("JYP", "2011-12-29", "2014-06-29"), p("ThorZaIN", "2012-05-09", "2017-01-01"),
+      p("Suppy", "2012-07-24", "2017-01-01"), p("Stephano", "2012-09-09", "2014-05-14"),
+      p("Jaedong", "2012-12-04", "2016-10-31"), p("Revival", "2012-12-09", "2013-12-12"),
+      p("aLive", "2013-03-27", "2013-12-12"), p("Oz", "2013-03-27", "2013-12-12"),
+      p("Xenocider", "2013-06-04", "2017-01-01")
     ]
   },
   {
-    id: "dragonphoenix",
-    name: "Dragon Phoenix Gaming",
-    aliases: ["dragon phoenix gaming", "dpg"],
+    id: "skt", name: "SK Telecom T1", aliases: ["sk telecom t1", "sk telecom", "skt", "skt t1", "sktt1", "t1"],
     players: [
-      { name: "Dark",  start: "2019-10-07", end: "2023-03-13" },
-      { name: "Cure",  start: "2019-12-02", end: "2023-02-23" },
-      { name: "Rogue", start: "2020-11-30", end: "2022-10-05" },
-      { name: "Zest",  start: "2021-02-08", end: "2022-06-19" },
-      { name: "herO",  start: "2021-06-24", end: "2023-03-13" }
+      p("BeSt", "2006-08-21", "2013-07-26"), p("FanTaSy", "2007-04", "2014-09-30"),
+      p("Bisu", "2008-02-10", "2013-09-09"), p("soO", "2008-04", "2016-10-18"),
+      p("Rain", "2010-10-01", "2014-09-30"), p("TRUE", "2011-11-04", "2012-11-02"),
+      p("Sacsri", "2011-11-04", "2014-04-10"), p("Dark", "2012-11-11", "2016-10-18"),
+      p("PartinG", "2013-01-14", "2014-09-30"), p("Classic", "2013-08-31", "2016-10-18"),
+      p("Soulkey", "2013-10-15", "2014-09-25"), p("INnoVation", "2014-09-25", "2016-10-18"),
+      p("Dream", "2014-09-25", "2016-10-18"), p("Billowy", "2014-12-10", "2015-12-03"),
+      p("Impact", "2015-05-08", "2016-10-18"), p("Zoun", "2015-05-08", "2016-10-18"),
+      p("MyuNgSiK", "2016-01-14", "2016-10-18"), p("herO", "2025-09-25")
     ]
   },
   {
-    id: "shopify",
-    name: "Shopify Rebellion",
-    aliases: ["shopify rebellion", "shopify"],
+    id: "ktrolster", name: "KT Rolster", aliases: ["kt rolster", "kt", "ktf"],
     players: [
-      { name: "ByuN",     start: "2021-02-19", end: "Présent" },
-      { name: "Lambo",    start: "2021-02-19", end: "Présent" },
-      { name: "Scarlett", start: "2021-02-19", end: "Présent" }
+      p("Flash", "2007", "2015-12-01"), p("Stats", "2009-07-02", "2016-10-18"),
+      p("Zest", "2011-11-04", "2016-10-18"), p("MyuNgSiK", "2012-06-24", "2014-09-04"),
+      p("TY", "2013-09-16", "2016-10-18"), p("First", "2015-01-13", "2015-09-13"),
+      p("Life", "2015-02-11", "2016-01-28"), p("Super", "2015-04-29", "2015-12-01"),
+      p("jjakji", "2015-12-01", "2016-10-18"), p("Losira", "2015-12-02", "2016-10-18"),
+      p("Trust", "2015-12-02", "2016-10-18"), p("Leenock", "2016-01-27", "2016-10-18")
     ]
   },
   {
-    id: "evilgeniuses",
-    name: "Evil Geniuses",
-    aliases: ["evil geniuses", "eg"],
+    id: "cjentus", name: "CJ Entus", aliases: ["cj entus", "cj"],
     players: [
-      { name: "HuK",      start: "2011-08-16", end: "2017-01-01" },
-      { name: "Stephano", start: "2012-09-10", end: "2013-08-06" },
-      { name: "Jaedong",  start: "2012-12-05", end: "2016-11-01" }
+      p("Bbyong", "2008-08-13", "2016-10-18"), p("EffOrt", "2011-03-21", "2014-09-11"),
+      p("Hydra", "2011-05-08", "2014-09-11"), p("Leta", "2011-05-08", "2013-04-04"),
+      p("Snow", "2011-05-08", "2013-05-28"), p("herO", "2011-11-04", "2016-10-18"),
+      p("Bunny", "2013-03-13", "2016-10-18"), p("Trust", "2013-03-13", "2015-11-26"),
+      p("GuMiho", "2014-01-27", "2014-09-01"), p("ByuL", "2014-07-31", "2016-10-18"),
+      p("RagnaroK", "2015-01-23", "2016-10-18"), p("MC", "2016-05-23", "2016-10-18")
     ]
   },
   {
-    id: "slayers",
-    name: "SlayerS",
-    aliases: ["slayers"],
+    id: "slayers", name: "SlayerS", aliases: ["slayers", "slayers clan"],
     players: [
-      { name: "MMA",   start: "2010-11-30", end: "2012-11-03" },
-      { name: "TaeJa", start: "2011-05-01", end: "2012-03-12" },
-      { name: "Dark",  start: "2012",       end: "2012-11" }
+      p("BoxeR", "2010-11-30", "2012-08-16"), p("MMA", "2010-11-30", "2012-11-03"),
+      p("Alicia", "2010-11-30", "2012-11-03"), p("Cella", "2010-11-30", "2012-11-03"),
+      p("Dragon", "2010-11-30", "2012-01-16"), p("Golden", "2010-11-30", "2012-01-16"),
+      p("YugiOh", "2010-11-30", "2012-11-03"), p("Ryung", "2010-12", "2012-11-03"),
+      p("Brown", "2011-04-11", "2012-11-03"), p("TaeJa", "2011-05-01", "2012-03-13"),
+      p("Eve", "2011-07-14", "2012-11-03"), p("CoCa", "2011-08-17", "2012-11-03"),
+      p("Puzzle", "2011-08-20", "2012-11-03"), p("CranK", "2011-09-24", "2012-07-17"),
+      p("Dark", "2012-03-16", "2012-11-03"), p("Arthur", "2012-03-25", "2012-11-03"),
+      p("Genius", "2012-07-26", "2012-11-03")
     ]
   },
   {
-    id: "stxsoul",
-    name: "STX SouL",
-    aliases: ["stx soul", "stx", "soul"],
+    id: "mouz", name: "MOUZ", aliases: ["mouz", "mousesports", "mouz."],
     players: [
-      { name: "Trap",       start: "2008-03-05", end: "2013-12-14" },
-      { name: "INnoVation", start: "2008-08-13", end: "2013-08-31" },
-      { name: "Classic",    start: "2010-10-13", end: "2013-08-31" }
+      p("GhosTa", "2010-03-24", "2011-07-20"), p("IefNaij", "2010-03-24", "2010-08-01"),
+      p("Kolll", "2010-03-24", "2010-10-13"), p("MorroW", "2010-03-24", "2012-06-27"),
+      p("Strelok", "2010-03-24", "2011-05-13"), p("White-Ra", "2010-03-24", "2011-01-04"),
+      p("HayprO", "2010-04-19", "2010-07-02"), p("Naama", "2010-10-13", "2011-02-28"),
+      p("ParanOid", "2010-10-13", "2011-01-04"), p("Dreiven", "2011-01-04", "2011-07-07"),
+      p("MaNa", "2011-03-29", "2013-12-31"), p("ThorZaIN", "2011-05-07", "2012-05-09"),
+      p("biGs", "2011-09-16", "2012-07-22"), p("Protosser", "2012-06-27", "2013-05-30"),
+      p("Illusion", "2013-02-14", "2013-07-17"), p("LucifroN", "2013-05-30", "2014-01-11"),
+      p("VortiX", "2013-05-30", "2014-06-02"), p("Dear", "2013-12-19", "2014-04-11"),
+      p("HasuObs", "2010-03", "2015-06-09"), p("HeRoMaRinE", "2011-11-05")
     ]
   },
   {
-    id: "ktrolster",
-    name: "KT Rolster",
-    aliases: ["kt rolster", "kt"],
+    id: "millenium", name: "Millenium", aliases: ["millenium", "millennium", "mil"],
     players: [
-      { name: "Flash", start: "2007",       end: "2015-12-01" },
-      { name: "Zest",  start: "2011-11-04", end: "2016-10-18" },
-      { name: "Life",  start: "2015-02-11", end: "2016-01-28" }
+      p("MoMaN", "2010-06-12", "2010-12-22"), p("HuK", "2010-06-16", "2010-10-24"),
+      p("KleeneX", "2010-08-24", "2016-12-31"), p("LaLuSh", "2010-08-24", "2016-12-31"),
+      p("Adelscott", "2010-09-15", "2016-12-31"), p("Stephano", "2010-10-06", "2012-08-20"),
+      p("Tarson", "2010-11-22", "2012-12-09"), p("ToD", "2011-01-08", "2011-09-07"),
+      p("DieStar", "2011-01-10", "2016-12-23"), p("Feast", "2011-10-28", "2013-12-04"),
+      p("Dragon", "2012-03-06", "2012-12-02"), p("ForGG", "2012-06-27", "2015-12-02"),
+      p("Dayshi", "2012-10-27", "2016-12-22"), p("Goswser", "2012-12-08", "2015-01-26"),
+      p("MaddeLisk", "2013-01-29", "2016-12-23"), p("BabyKnight", "2013-08-31", "2014-05-20"),
+      p("MarineLorD", "2013-12-01", "2016-12-23"), p("VortiX", "2014-06-07", "2014-12-17"),
+      p("Lilbow", "2014-11-30", "2016-07-14"), p("ShoWTimE", "2015-12-10", "2016-12-22")
     ]
   },
   {
-    id: "millenium",
-    name: "Millenium",
-    aliases: ["millenium", "millennium"],
+    id: "psistorm", name: "PSISTORM Gaming", aliases: ["psistorm gaming", "psistorm", "psi"],
     players: [
-      { name: "HuK",      start: "2010-06-17", end: "2010-09-25" },
-      { name: "Stephano", start: "2010-10-07", end: "2012-09-10" },
-      { name: "ForGG",    start: "2012-09-10", end: "2015" }
+      p("EnDerr", "2015-01-01", "2016-08-01"), p("NoRegreT", "2015-06-29", "2016-09-11"),
+      p("TRUE", "2015-09-29", "2020-06-15"), p("PiLiPiLi", "2015-11-12", "2019-02-01"),
+      p("Strange", "2016-09-28", "2018-04-04"), p("GuMiho", "2017-02-02", "2019-12-31"),
+      p("Silky", "2017-02-28", "2021-03-13"), p("RagnaroK", "2018-04-03", "2019-06-14"),
+      p("PartinG", "2019-05-12", "2019-11-12"), p("GuMiho", "2021-07-01", "2023-02-24"),
+      p("MaxPax", "2021-05-26")
     ]
   },
   {
-    id: "alphax",
-    name: "Alpha X",
-    aliases: ["alpha x", "alphax"],
+    id: "vitality", name: "Team Vitality", aliases: ["team vitality", "vitality", "vit"],
     players: [
-      { name: "Zoun",    start: "2020-02-08", end: "2023-03-13" },
-      { name: "SHIN",    start: "2020-06-30", end: "2023-05-13" },
-      { name: "Classic", start: "2021-08-01", end: "2022-05-31" }
+      p("Solar", "2024-02-01", "2024-10-01"), p("Maru", "2024-02-01", "2026-03-06"),
+      p("Ryung", "2024-02-01", "2026-03-06"), p("Zoun", "2025-04-13", "2026-03-06")
     ]
   },
   {
-    id: "teamvitality",
-    name: "Team Vitality",
-    aliases: ["team vitality", "vitality"],
+    id: "onsyde", name: "ONSYDE", aliases: ["onsyde", "onsyde gaming"],
     players: [
-      { name: "Solar", start: "2024-02-01", end: "2024-10-01" },
-      { name: "Maru",  start: "2024-02-01", end: "2026-03-06" },
-      { name: "Zoun",  start: "2025-04-13", end: "2026-03-06" }
+      p("Maru", "2022-03-31", "2024-02-01"), p("Neeb", "2022-05-22", "2023-03-01"),
+      p("Solar", "2022-08-21", "2024-02-01"), p("Maru", "2026-03-06"),
+      p("Ryung", "2026-03-06"), p("Zoun", "2026-03-06"), p("Krystianer", "2026-03-06"),
+      p("Neeb", "2026-06-22"), p("SHIN", "2026-06-25")
     ]
   },
   {
-    id: "cjentus",
-    name: "CJ Entus",
-    aliases: ["cj entus", "cj"],
+    id: "shopify", name: "Shopify Rebellion", aliases: ["shopify rebellion", "shopify", "sr"],
     players: [
-      { name: "herO",   start: "2011-11-04", end: "2016-10-18" },
-      { name: "GuMiho", start: "2014-01-27", end: "2014-09-01" },
-      { name: "SHIN",   start: "2015-01-22", end: "2016-10-18" }
+      p("ByuN", "2021-02-19"), p("Lambo", "2021-02-19"), p("Scarlett", "2021-02-19"),
+      p("Harstem", "2022-02-01")
     ]
   },
   {
-    id: "weibogaming",
-    name: "Weibo Gaming",
-    aliases: ["weibo gaming", "weibo"],
+    id: "dragonphoenix", name: "Dragon Phoenix Gaming", aliases: ["dragon phoenix gaming", "dragon phoenix", "dpg"],
     players: [
-      { name: "herO", start: "2023-03-13", end: "2025-02-27" },
-      { name: "Dark", start: "2023-03-13", end: "2024-01-14" },
-      { name: "SHIN", start: "2025-04-15", end: "2026-01-12" }
+      p("Dark", "2019-10-07", "2023-03-13"), p("Cure", "2019-12-02", "2023-02-23"),
+      p("Rogue", "2020-11-30", "2022-10-05"), p("Zest", "2021-02-08", "2022-06-19"),
+      p("herO", "2021-06-24", "2023-03-13")
     ]
   },
   {
-    id: "teamqlash",
-    name: "Team QLASH",
-    aliases: ["team qlash", "qlash"],
+    id: "weibogaming", name: "Weibo Gaming", aliases: ["weibo gaming", "weibo", "dkz", "dkz gaming"],
     players: [
-      { name: "Elazer", start: "2017-08-03", end: "2018-11-25" },
-      { name: "Lambo",  start: "2017-11-08", end: "2020-03-13" },
-      { name: "Reynor", start: "2020-02-15", end: "2022-03-21" }
+      p("herO", "2023-03-13", "2025-02-27"), p("Dark", "2023-03-13", "2024-01-14"),
+      p("SHIN", "2025-04-15", "2026-01-12")
     ]
   },
   {
-    id: "prime",
-    name: "Prime",
-    aliases: ["prime"],
+    id: "teamqlash", name: "Team QLASH", aliases: ["team qlash", "qlash"],
     players: [
-      { name: "Polt",    start: "2010",       end: "2011-09-14" },
-      { name: "ByuN",    start: "2011-10-08", end: "2015-10-18" },
-      { name: "Creator", start: "2011",       end: "2015-07-20" },
-      { name: "Zoun",    start: "2014-11-01", end: "2015-05-08" }
+      p("Elazer", "2017-08-03", "2018-11-25"), p("Lambo", "2017-11-08", "2020-03-13"),
+      p("Reynor", "2020-02-15", "2022-03-21")
+    ]
+  },
+  {
+    id: "alphax", name: "Alpha X", aliases: ["alpha x", "alphax"],
+    players: [
+      p("Zoun", "2020-02-08", "2023-03-13"), p("SHIN", "2020-06-30", "2023-05-13"),
+      p("Classic", "2021-08-01", "2022-05-31")
     ]
   }
 ];
