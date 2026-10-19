@@ -1385,6 +1385,11 @@ function giveUp(){
    avec la date d'arrivée et de départ ("Présent" pour les joueurs actuels).
    Les anciens joueurs sont révélés en premier, puis les joueurs actuels.
    ========================================================================== */
+// Raccourci : p(nom, arrivée, départ) — sans départ = joueur actuel
+function p(name, start, end){
+  return { name, start, end: end || 'Présent' };
+}
+
 const TEAMS = [
   // Source : Liquipedia (pages d'équipe, sections "Player Roster")
   {
